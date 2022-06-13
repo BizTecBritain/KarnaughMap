@@ -11,11 +11,17 @@ Classes:
 
 Functions:
 
-    KarnaughMapObject.create_map(tot_input=None, expression=None) -> (bool) success
-    KarnaughMapObject.print(object, file) -> (None)
-    KarnaughMapObject.to_string(object, file) -> (str) reader-friendly table
-    KarnaughMap.get_tot_variables(expression: str) -> (Union[int, None]) total number of variables
-    KarnaughMapObject.solve_map(self: object) -> (str) simplified binary logic representation of map
+    Public:
+        KarnaughMap.reset(self: _KMap) -> None
+        KarnaughMap.create_map(self: _KMap, tot_input: int = None, expression: str = None) -> (bool) success
+        KarnaughMap.print(self: _KMap) -> (None)
+        KarnaughMap.to_string(self: _KMap) -> (str) reader-friendly table
+        @staticmethod KarnaughMap.get_tot_variables(expression: str) -> (Union[int, None]) total number of variables
+        KarnaughMap.solve_map(self: _KMap) -> (str) simplified binary logic representation of map
+    Private:
+        @staticmethod KarnaughMap._evaluate_expression(equation: Union[str, List]) -> (str) The solution
+                                                                                        (bool True/False) as an integer
+                                                                                        string ("1"/"0")
 
 Misc variables:
 
@@ -27,7 +33,7 @@ Misc variables:
 
 __all__ = ["KarnaughMap"]
 __author__ = "Alexander Bisland"
-__version__ = "2.5.1"
+__version__ = "2.6.1"
 supported_from = "3.8.1"
 
 import re
@@ -38,8 +44,6 @@ _KMap = TypeVar("_KMap", bound="KarnaughMap")
 
 
 class KarnaughMap:  # TODO - map middle for 5+6
-    #                      - add CLI
-    #                      - add if __name__=="__main__":
     """Create Karnaugh Map objects which can be solved and manipulated.
     Supported characters:
         Any case is supported
@@ -49,11 +53,17 @@ class KarnaughMap:  # TODO - map middle for 5+6
 
     Functions:
 
-        KarnaughMapObject.create_map(tot_input=None, expression=None) -> (bool) success
-        KarnaughMapObject.print(object, file) -> (None)
-        KarnaughMapObject.to_string(object, file) -> (str) reader-friendly table
-        KarnaughMap.get_tot_variables(expression: str) -> (Union[int, None]) total number of variables
-        KarnaughMapObject.solve_map(self: object) -> (str) simplified binary logic representation of map
+        Public:
+            KarnaughMap.reset(self: _KMap) -> None
+            KarnaughMap.create_map(self: _KMap, tot_input: int = None, expression: str = None) -> (bool) success
+            KarnaughMap.print(self: _KMap) -> (None)
+            KarnaughMap.to_string(self: _KMap) -> (str) reader-friendly table
+            @staticmethod KarnaughMap.get_tot_variables(expression: str) -> (Union[int, None]) total number of variables
+            KarnaughMap.solve_map(self: _KMap) -> (str) simplified binary logic representation of map
+        Private:
+            @staticmethod KarnaughMap._evaluate_expression(equation: Union[str, List]) -> (str) The solution
+                                                                                            (bool True/False) as an
+                                                                                            integer string ("1"/"0")
 
     GLOBAL static variables:
 
@@ -100,11 +110,11 @@ class KarnaughMap:  # TODO - map middle for 5+6
             Returns:
                 Nothing (None): Null
         """
+        self.table = []
         self.tot_input = tot_input
         self.expression = expression
         self.valid_symbols = None
         self.debug = debug
-        self.table = []
         self.result = ""
         self.raise_error = raise_error
         self.groups = []
@@ -121,10 +131,8 @@ class KarnaughMap:  # TODO - map middle for 5+6
         self.tot_input = None
         self.expression = None
         self.valid_symbols = None
-        self.debug = False
         self.table = []
         self.result = ""
-        self.raise_error = True
         self.groups = []
 
     def create_map(self: _KMap, tot_input: int = None, expression: str = None) -> bool:
@@ -151,6 +159,12 @@ class KarnaughMap:  # TODO - map middle for 5+6
                 self.table[arrayPos % len(tableDim[1])][arrayPos // len(tableDim[1])] = int(
                     KarnaughMap._evaluate_expression(KarnaughMap.__remove_brackets(expression)))
                 arrayPos += 1
+            if any(len(str(self.table[y][x])) != 1 for y in range(len(tableDim[1])) for x in range(len(tableDim[0]))):
+                self.table = []
+                if self.raise_error:
+                    raise ValueError("Invalid Input. Please put symbols between variables")
+                elif self.debug:
+                    print("Invalid Input. Please put symbols between variables")
             return True
         return False
 
@@ -276,12 +290,14 @@ class KarnaughMap:  # TODO - map middle for 5+6
                     self.tot_input = int(input("How many variables (max 4)? "))
             if self.tot_input not in [2, 3, 4, 5, 6]:  # start the checks for validity
                 if self.tot_input < 2:
+                    self.table = []
                     if self.raise_error:
                         raise ValueError("Num of inputs must be greater than or equal to 2: " + str(self.tot_input))
                     elif self.debug:
                         print("Num of inputs must be greater than or equal to 2: " + str(self.tot_input))
                     self.tot_input = None
                 elif self.tot_input > 6:
+                    self.table = []
                     if self.raise_error:
                         raise ValueError("Num of inputs must be less than or equal to 6: " + str(self.tot_input))
                     elif self.debug:
@@ -289,6 +305,7 @@ class KarnaughMap:  # TODO - map middle for 5+6
                     self.tot_input = None
                 return False
         except ValueError:
+            self.table = []
             if self.raise_error:
                 raise ValueError("Num of inputs must be a number")
             elif self.debug:
@@ -314,6 +331,7 @@ class KarnaughMap:  # TODO - map middle for 5+6
         self.expression = self.expression.replace(' ', '')
         self.expression = self.expression.replace('¬¬', '')
         if len(self.expression) == 0:  # start the checks for validity
+            self.table = []
             if self.raise_error:
                 raise ValueError("Please input an expression")
             elif self.debug:
@@ -322,12 +340,14 @@ class KarnaughMap:  # TODO - map middle for 5+6
             return False
         if all(symbol in ['v', '^', '¬', '(', ')'] + KarnaughMap.LETTERS for symbol in self.expression):
             if not all(symbol in self.valid_symbols for symbol in self.expression):
+                self.table = []
                 if self.raise_error:
                     raise ValueError("Some invalid letters were used, please change the total number of inputs")
                 elif self.debug:
                     print("Some invalid letters were used, please change the total number of inputs")
                 return False
         else:
+            self.table = []
             if self.raise_error:
                 raise ValueError("Expression contains invalid symbols")
             elif self.debug:
@@ -335,6 +355,7 @@ class KarnaughMap:  # TODO - map middle for 5+6
             self.expression = None
             return False
         if self.expression.count('(') != self.expression.count(')'):
+            self.table = []
             if self.raise_error:
                 raise ValueError("Number of brackets does\'t match")
             elif self.debug:
