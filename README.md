@@ -8,7 +8,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/BizTecBritain/KarnaughMap">
-    <img src="https://github.com/BizTecBritain/BizTecBritain/blob/main/BizTec.png" alt="Logo" width="580" height="300">
+    <img src="https://github.com/BizTecBritain/BizTecBritain/blob/main/BizTec.png?raw=true" alt="Logo" width="580" height="300">
   </a>
 
   <h3 align="center">Karnaugh Maps</h3>
@@ -58,13 +58,13 @@
 
 ## About The Project
 
-I was inspired by a topic that i was studying at school and so I made a program to solve Karnaugh maps
+I was inspired by a topic that I was studying at school and so I made a program to solve Karnaugh maps
 
 
 ### Built With
 
 * Python version >= 3.8
-* may work with earlier versions but it is untested feel free to try it by downloading from my github [https://github.com/BizTecBritain/KarnaughMap](https://github.com/BizTecBritain/KarnaughMap)
+* May work with earlier versions but it is untested feel free to try it by downloading from my github [https://github.com/BizTecBritain/KarnaughMap](https://github.com/BizTecBritain/KarnaughMap)
 
 
 
@@ -81,35 +81,34 @@ To get a local copy up and running follow these simple steps.
    $ sudo apt-get install python
   ```
 
-* (Optional) Create virtual environment
-  * #### Linux:
-    ```
-    $ python -m venv venv
-    $ venv/bin/activate
-    ```
-  * #### Windows:
-    ```
-    > python -m venv venv
-    > venv/Scripts/activate.bat
-    ```
-
 ### Installation
 
 Clone the repo with ```$ git clone https://github.com/BizTecBritain/KarnaughMap.git```
+Or install with ```$ pip install KarnaughMap```
 
 
 
 ## Usage
 
-First enter the directory with
-```
-$ cd src
-```
-
-Then to use this code as a GUI simply run
-```
-$ python main.py
-```
+This can be used as a library (see documentation) or run from the command line (you need to add to PATH)
+* To run the standard command line interface run:
+  ```
+  $ KMap.exe expression [-h] [--print-map] [--debug] [--tot-input TOT_INPUT]
+  
+  positional arguments:
+    expression            Unsimplified expression to simplify
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    --print-map, -p       Whether to print the map or not
+    --debug, -d           Debug mode (verbose)
+    --tot-input TOT_INPUT, -i TOT_INPUT
+                          Total number of inputs (Optional)
+  ```
+* To run the GUI from the command line run:
+  ```
+  $ KMapGUI.exe
+  ```
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 

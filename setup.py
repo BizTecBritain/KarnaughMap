@@ -5,7 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="KarnaughMap",
-    version="1.0.1",
+    version="1.1.2",
+    entry_points={'console_scripts': ['KMapGUI=KMap.GUI_CLI:cli', 'KMap=KMap.cli:cli'], },
     author="Alexander Bisland",
     author_email="biztecbritain@gmail.com",
     description="Dependency-free library to create Karnaugh Map objects which can be solved and manipulated (GUI and "
@@ -23,5 +24,6 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
+    package_data={'': ['day.gif', 'night.gif', 'off.gif', 'on.gif', 'offdark.png', 'ondark.png']},
     python_requires=">=3.8",
 )
